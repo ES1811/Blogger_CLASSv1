@@ -1,0 +1,81 @@
+## Ignore Visual Studio specific files
+.vscode/
+.vs/
+*.code-workspace
+
+## Ignore build outputs
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.pdb
+*.app/
+*.vspscc
+*.vssscc
+*.suo
+*.cache
+*.csproj.user
+*.csproj.DotSettings
+*.dbmdl
+*.log
+*.tlog
+*.ilk
+*.log
+*.cache
+*.ncb
+*.aps
+*.sdf
+*.suo
+*.ipch
+*.rsuser
+*.sln.docstates
+
+## Ignore ASP.NET Core environment specific files
+appsettings.*.json
+appsettings.Development.json
+
+## Ignore packages and dependencies
+node_modules/
+wwwroot/lib/
+wwwroot/node_modules/
+wwwroot/build/
+wwwroot/dist/
+
+## Ignore NuGet Packages
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+NuGet.config
+*.nuget.props
+*.nuget.targets
+
+## Ignore user secrets and credentials
+secrets.json
+secrets/
+
+## Ignore logs and databases
+*.log
+logs/
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+## Ignore coverage and test results
+coverage/
+TestResults/
+*.trx
+*.coverage
+*.testresults
+*.vscoverage
+.vscoverage*
+
+## Ignore JetBrains Rider / Resharper files
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+## Ignore Docker files
+docker-compose.override.yml
