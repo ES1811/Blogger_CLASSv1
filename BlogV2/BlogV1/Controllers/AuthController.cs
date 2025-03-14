@@ -41,6 +41,14 @@ public class AuthController : ControllerBase
         //create an instance of GenerateJWTToken
         //this then calls the GenerateJWTToken(user) method to generate a JWT token for the authenticated user
         var token = GenerateJwtToken(user);
+
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddHours(1)
+        };
         return Ok(new { Token = token });
     }
     private string GenerateJwtToken(User user)

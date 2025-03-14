@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+
+<body>
+    <h1>Welcome, please log in</h1>
+    <div id="login-container"
+        style="display:flex; flex-direction: column; width: 300px; height: 300; margin: auto; border: 1px solid black; padding: 20px; ">
+        <label for="useremail">Email</label>
+        <input type="email" name="email" id="email">
+        <label for="password">Password</label>
+        <input type="text" name="password" id="password"><br>
+        <button type="button" id="login-button" onclick="login()">Login</button>
+    </div>
+    <script>
+
+        async function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            console.log(email, password)
+            try {
+                const response = await fetch("http://localhost:5076/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email, password: password }),
+                    credentials: "include"
+                });
+                const data = await response.json();
+                console.log(data);
+                
+
+            } catch (error) {
+                console.error("Error", error)
+            }
+        }
+
+    </script>
+</body>
+
+</html>
