@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 //add the security namespace
 using System.Security.Claims;
+//add identity data to has passwords
+using Microsoft.AspNetCore.Identity;
 
 [Route("users")]
 [ApiController]
@@ -30,6 +32,10 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { Message = "user already exists" });
         }
+        
+        //hash the password
+        var passwordHasher = new PasswordHasher<User>();
+        user.Password = passwordHasher.HashPassword(user, user.Password);
 
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
@@ -60,6 +66,13 @@ public class UserController : ControllerBase
         existingUser.UserName = updatedUser.UserName ?? existingUser.UserName;
         existingUser.Email = updatedUser.Email ?? existingUser.Email;
         existingUser.Password = updatedUser.Password ?? existingUser.Password;
+
+        //check if a new password is provided, and if it is, hash it
+        if(!string.IsNullOrEmpty(updatedUser.Password))
+        {
+            var passwordHasher = new PasswordHasher<User>();
+            existingUser.Password = passwordHasher.HashPassword(existingUser, updatedUser.Password);
+        }
 
         await _context.SaveChangesAsync();
         Console.WriteLine("testing");

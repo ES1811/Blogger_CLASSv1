@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 //jwt namespace need to be installed manually
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
+//required for password hashing
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +89,9 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+//add to check
+SeedAdminUser(app);
+
 app.UseStaticFiles();
 
 //enable swagger only in development
@@ -112,5 +117,28 @@ app.MapGet("/", (context) =>
     context.Response.Redirect("/index.html");
     return Task.CompletedTask;
 });
+
+void SeedAdminUser(WebApplication app)
+{
+    using(var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        //check if database is available before seeding
+        if(context.Database.CanConnect() && !context.Users.Any(u => u.UserRole == UserRole.Admin))
+        {
+            var passwordHasher = new PasswordHasher<User>();
+            var adminUser = new User
+            {
+                UserRole = UserRole.Admin,
+                UserName = "admin",
+                Email = "admin@email.com",
+                Password = passwordHasher.HashPassword(null, "1234") //secure hashed password
+            };
+            context.Users.Add(adminUser);
+            context.SaveChanges();
+            Console.WriteLine("admin user created successfully"); //log the success
+        }
+    }
+}
 
 app.Run();
