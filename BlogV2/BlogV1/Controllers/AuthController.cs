@@ -1,4 +1,5 @@
 //namespaces
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,20 +28,40 @@ public class AuthController : ControllerBase
     }
     //common endpoints
     //we want to get a request from the login request
+    //we need to use PasswordHasher here
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
+        //the check needs to be done by email now
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email); //&& u.Password == request.Password);
         //this line checks if a user exists in the database with the provided email and password
         //now we check the users
         if (user == null)
         {
             return Unauthorized(new { Message = "Invalid email or password", Error = 401 });
         }
+
+        //verify the hashed password
+        var passwordHasher = new PasswordHasher<User>();
+        //result
+        var result = passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
+        //if it fails
+        if(result == PasswordVerificationResult.Failed)
+        {
+            return Unauthorized(new{Message = "invalid email or password", Error = 401});
+        }
         //if user exists, we create a token
         //create an instance of GenerateJWTToken
         //this then calls the GenerateJWTToken(user) method to generate a JWT token for the authenticated user
         var token = GenerateJwtToken(user);
+
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddHours(1)
+        };
         return Ok(new { Token = token });
     }
     private string GenerateJwtToken(User user)
