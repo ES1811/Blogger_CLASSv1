@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        button {
+            padding: 2px;
+            margin: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -16,6 +22,9 @@
         <label for="password">Password</label>
         <input type="text" name="password" id="password"><br>
         <button type="button" id="login-button" onclick="login()">Login</button>
+        <button type="button" id="get-users" onclick="getUsers()">Get Users</button>
+        <button type="button" id="logout-button" onclick="logout()">Log out</button>
+        <p id="users"></p>
     </div>
     <script>
 
@@ -33,11 +42,56 @@
                 });
                 const data = await response.json();
                 console.log(data);
-                
+                //set data to browser's local storage
+                localStorage.setItem("jwtToken", data.token);
+                console.log("token stored successfully", data.token);
+                alert("login successful");
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
 
             } catch (error) {
                 console.error("Error", error)
             }
+        }
+
+        async function getUsers() {
+            try {
+                const token = localStorage.getItem("jwtToken"); //retrieve the token
+                if (!token) {
+                    alert("unauthorized, please log in first");
+                    return;
+                }
+                const response = await fetch("http://localhost:5076/users/allusers", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` //attach the token
+                    }
+                });
+                if (!response.ok) { //if response is 403 handle it properly
+                    if (response.status === 403) {
+                        alert("you don't have permission to access user data");
+                        return;
+                    } else {
+                        throw new Error(`HTTP error, status: ${response.status}`)
+                    }
+                }
+                console.log(response)
+                const data = await response.json();
+                console.log(data);
+                let userData = "";
+                for(var i = 0; i<data.length; i++){
+                    userData += '<p>' + data[i].email + '</p>';
+                }
+                document.getElementById("users").innerHTML = userData;
+                
+            } catch (error) {
+                console.error("error", error);
+            }
+        }
+        function logout(){
+            localStorage.removeItem("jwtToken");
+            alert("logged out successfully");
         }
 
     </script>
