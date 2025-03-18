@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button {
+            padding: 2px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="registration-form"
+        style="display:flex; flex-direction: column; width: 300px; height: 300; margin: auto; border: 1px solid black; padding: 20px;">
+        <label for="reg-email">Email</label>
+        <input type="email" name="reg-email" id="reg-email">
+        <label for="reg-username">Username</label>
+        <input type="text" name="reg-username" id="reg-username">
+        <label for="reg-pass">Password</label>
+        <input type="text" name="reg-pass" id="reg-pass">
+        <button type="button" onclick="register()">Register</button>
+    </div>
+    <script>
+        async function register() {
+            const regUsername = document.getElementById("reg-username").value;
+            const regEmail = document.getElementById("reg-email").value;
+            const regPass = document.getElementById("reg-pass").value;
+            try {
+                const response = await fetch("http://localhost:5076/users/adduser", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: regUsername, email: regEmail, password: regPass })
+                });
+                console.log(response)
+                if (!response.ok) { throw new Error("unable to send") }
+                const data = await response.json()
+                console.log(data)
+
+                document.getElementById("reg-username").value = "";
+                document.getElementById("reg-email").value = "";
+                document.getElementById("reg-pass").value = "";
+
+            } catch (error) {
+                console.error("Error", error)
+            }
+
+        }
+    </script>
+</body>
+
+</html>

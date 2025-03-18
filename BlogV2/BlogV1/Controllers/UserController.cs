@@ -16,6 +16,13 @@ public class UserController : ControllerBase
     {
         _context = context;
     }
+
+    [HttpGet]
+    public ActionResult Index()
+    {
+        return Redirect("./register.html");
+    }
+
     [HttpGet("allusers")]
     [Authorize(Roles = "Admin")] //only admins can access this now
     public async Task<ActionResult<User>> AllUsers()
@@ -32,7 +39,7 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { Message = "user already exists" });
         }
-        
+
         //hash the password
         var passwordHasher = new PasswordHasher<User>();
         user.Password = passwordHasher.HashPassword(user, user.Password);
@@ -56,9 +63,9 @@ public class UserController : ControllerBase
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
         //admin can update all users but also user can update their own account
-        if(userIdFromToken != id && userRole !="Admin")
+        if (userIdFromToken != id && userRole != "Admin")
         {
-            return StatusCode(403, new{Message = "you cannot update other people's accounts"});
+            return StatusCode(403, new { Message = "you cannot update other people's accounts" });
         }
 
         //only update fields if new values are provided(keep old values otherwise)
@@ -68,7 +75,7 @@ public class UserController : ControllerBase
         existingUser.Password = updatedUser.Password ?? existingUser.Password;
 
         //check if a new password is provided, and if it is, hash it
-        if(!string.IsNullOrEmpty(updatedUser.Password))
+        if (!string.IsNullOrEmpty(updatedUser.Password))
         {
             var passwordHasher = new PasswordHasher<User>();
             existingUser.Password = passwordHasher.HashPassword(existingUser, updatedUser.Password);
@@ -97,9 +104,9 @@ public class UserController : ControllerBase
         //only allow deletion if:
         //- user is Admin (userRoleFromToken == "Admin")
         //- or the user is deleting their own account (userIsFromToken == id)
-        if(userIdFromToken !=id && userRoleFromToken != "Admin")
+        if (userIdFromToken != id && userRoleFromToken != "Admin")
         {
-            return StatusCode(403, new{Message = "you can only delete your own account"});
+            return StatusCode(403, new { Message = "you can only delete your own account" });
         }
 
         _context.Users.Remove(existingUser);

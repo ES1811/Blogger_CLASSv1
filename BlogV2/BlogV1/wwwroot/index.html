@@ -26,6 +26,7 @@
         <button type="button" id="logout-button" onclick="logout()">Log out</button>
         <p id="users"></p>
     </div>
+    
     <script>
 
         async function login() {
@@ -80,19 +81,20 @@
                 const data = await response.json();
                 console.log(data);
                 let userData = "";
-                for(var i = 0; i<data.length; i++){
+                for (var i = 0; i < data.length; i++) {
                     userData += '<p>' + data[i].email + '</p>';
                 }
                 document.getElementById("users").innerHTML = userData;
-                
+
             } catch (error) {
                 console.error("error", error);
             }
         }
-        function logout(){
+        function logout() {
             localStorage.removeItem("jwtToken");
             alert("logged out successfully");
         }
+
 
     </script>
 </body>
